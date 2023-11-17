@@ -7,7 +7,8 @@ import PokemonDetail from './PokemonDetail'
 //remember when calling things from the same folder to use ./ to call it. no added path needed
 
 const Main = () => {
-    
+  ///any restful stuff will be happening here. So like adding pokemon teams, editing, updating that info, and deleting.
+  
 
     return (
   <main>

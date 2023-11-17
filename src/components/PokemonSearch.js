@@ -1,10 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function PokemonSearch() {
   const [pokemonName, setPokemonName] = useState("");
   const [pokemonData, setPokemonData] = useState(null);
   const [suggestedPokemon, setSuggestedPokemon] = useState([]);
+
+  const navigate = useNavigate();
+  
 
   const handleSearch = async () => {
     try {
@@ -47,41 +51,83 @@ function PokemonSearch() {
     }
   };
 
-  const handleSelect = (selectedPokemon) => {
-    // Set the selected Pokémon name when an option is clicked
-    setPokemonName(selectedPokemon);
-  };
+  const handleSelect = async (selectedPokemon) => {
+    try {
+      // Fetch detailed information for the selected Pokémon
+      const response = await axios.get(
+        `https://pokeapi.co/api/v2/pokemon/${selectedPokemon}`
+      );
+      setPokemonData(response.data);
+    } catch (error) {
+      console.error("Error fetching Pokémon data:", error);
+    }
 
-  const handleBlur = () => {
-    // Clear the suggestions when the input loses focus
+    // Clear the suggestions
     setSuggestedPokemon([]);
   };
 
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    handleSearch();
+    handleSelect();
+
+    // Clear the suggestions
+    setSuggestedPokemon([]);
+  };
+
+  const handleBlur = () => {
+    // Clear the suggestions
+    setSuggestedPokemon([]);
+  };
+
+  useEffect(() => {
+    // Add a click event listener to the window to close the dropdown on outside click
+    const handleClickOutside = (e) => {
+      if (
+        e.target.id !== "pokemonInput" && // Check if the clicked element is not the input
+        !e.target.classList.contains("suggestion-item") // Check if the clicked element is not a suggestion item
+      ) {
+        setSuggestedPokemon([]); // Close the dropdown
+      }
+
+
+    };
+
+    window.addEventListener("click", handleClickOutside);
+
+    // Remove the event listener when the component is unmounted
+    return () => {
+      window.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
+
   return (
     <div>
-      <input
-        type="text"
-        placeholder="Enter Pokémon name or ID"
-        value={pokemonName}
-        onChange={handleInputChange}
-        onBlur={handleBlur}
-      />
-      <button onClick={handleSearch}>Search</button>
+      <form onSubmit={handleFormSubmit}>
+        <input
+          type="text"
+          placeholder="Enter Pokémon name"
+          value={pokemonName}
+          onChange={handleInputChange}
+          onBlur={handleBlur}
+          list="pokemonSuggestions"
+        />
+        <button type="submit">Search</button>
+      </form>
 
       {/* Display the dropdown list of suggested Pokémon */}
       {suggestedPokemon.length > 0 && (
-        <select onChange={(e) => handleSelect(e.target.value)}>
+        <datalist id="pokemonSuggestions">
           {suggestedPokemon.map((name) => (
-            <option key={name} value={name}>
-              {name}
-            </option>
+            <option key={name} value={name} />
           ))}
-        </select>
+        </datalist>
       )}
 
       {pokemonData && (
         <div>
-          <h2>{pokemonData.name}</h2>
+          <h2 onClick={() => navigate (`/pokemon/${pokemonData.name}`)}>
+            {pokemonData.name}</h2>
           <p>
             Types: {pokemonData.types.map((type) => type.type.name).join(", ")}
           </p>
