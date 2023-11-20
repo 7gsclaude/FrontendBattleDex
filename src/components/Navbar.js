@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 
 const Nav = styled.div`
-  background-color: #e40505;
+  background-color: #e05555;
   display: flex; /* Use flexbox for layout */
   justify-content: space-between; /* Align items to the right */
   padding: 10px; /* Add some padding for spacing */
@@ -49,7 +49,7 @@ function Navbar() {
       
       </NavLinks>
 
-      <CustomButton>home page</CustomButton>
+      <Link to="/myteam"><CustomButton>My Team</CustomButton></Link>
     </Nav>
   );
 }

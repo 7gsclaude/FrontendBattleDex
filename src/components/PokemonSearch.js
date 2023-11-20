@@ -1,11 +1,23 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
+
+const PokeSearch = styled.div`
+  background-color: #e05555;
+  padding: 10px; /* Add some padding for spacing */
+`;
+
+const PokeDisplay = styled.div`
+background-color: #116fc2;
+padding: 10px; /* Add some padding for spacing */
+`
 
 function PokemonSearch() {
   const [pokemonName, setPokemonName] = useState("");
   const [pokemonData, setPokemonData] = useState(null);
   const [suggestedPokemon, setSuggestedPokemon] = useState([]);
+
 
   const navigate = useNavigate();
   
@@ -103,17 +115,19 @@ function PokemonSearch() {
 
   return (
     <div>
-      <form onSubmit={handleFormSubmit}>
-        <input
-          type="text"
-          placeholder="Enter Pokémon name"
-          value={pokemonName}
-          onChange={handleInputChange}
-          onBlur={handleBlur}
-          list="pokemonSuggestions"
-        />
-        <button type="submit">Search</button>
-      </form>
+      <PokeSearch>
+        <form onSubmit={handleFormSubmit}>
+          <input
+            type="text"
+            placeholder="Enter Pokémon name"
+            value={pokemonName}
+            onChange={handleInputChange}
+            onBlur={handleBlur}
+            list="pokemonSuggestions"
+          />
+          <button type="submit">Search</button>
+        </form>
+      </PokeSearch>
 
       {/* Display the dropdown list of suggested Pokémon */}
       {suggestedPokemon.length > 0 && (
@@ -125,14 +139,18 @@ function PokemonSearch() {
       )}
 
       {pokemonData && (
-        <div>
-          <h2 onClick={() => navigate (`/pokemon/${pokemonData.name}`)}>
-            {pokemonData.name}</h2>
-          <p>
-            Types: {pokemonData.types.map((type) => type.type.name).join(", ")}
-          </p>
-          {/* Display other Pokémon data as needed */}
-        </div>
+        <PokeDisplay>
+          <div>
+            <h2 onClick={() => navigate(`/pokemon/${pokemonData.name}`)}>
+              {pokemonData.name}
+            </h2>
+            <p>
+              Types:{" "}
+              {pokemonData.types.map((type) => type.type.name).join(", ")}
+            </p>
+            {/* Display other Pokémon data as needed */}
+          </div>
+        </PokeDisplay>
       )}
     </div>
   );
