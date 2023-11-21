@@ -3,31 +3,52 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
+
+const PokeDexImage = styled.img`
+width: 60%;
+height: 60%;
+
+`
+
 const PokeSearch = styled.div`
   background-color: #e05555;
   padding: 10px; /* Add some padding for spacing */
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
+
 const PokeDisplay = styled.div`
-background-color: #116fc2;
+background-color: #edeff1;
 padding: 10px; /* Add some padding for spacing */
 `
+
 
 function PokemonSearch() {
   const [pokemonName, setPokemonName] = useState("");
   const [pokemonData, setPokemonData] = useState(null);
   const [suggestedPokemon, setSuggestedPokemon] = useState([]);
-
+  const [pokemonSprite, setPokemonSprite] = useState(null); // New state for sprite URL
 
   const navigate = useNavigate();
-  
 
   const handleSearch = async () => {
     try {
       const response = await axios.get(
         `https://pokeapi.co/api/v2/pokemon/${pokemonName}`
       );
+
       setPokemonData(response.data);
+
+      // Fetch the sprite URL separately
+      const spriteResponse = await axios.get(
+        `https://pokeapi.co/api/v2/pokemon-species/${response.data.id}`
+      );
+      setPokemonSprite(
+        `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${response.data.id}.png`
+      );
     } catch (error) {
       console.error("Error fetching Pokémon data:", error);
       if (error.response && error.response.status === 404) {
@@ -63,25 +84,9 @@ function PokemonSearch() {
     }
   };
 
-  const handleSelect = async (selectedPokemon) => {
-    try {
-      // Fetch detailed information for the selected Pokémon
-      const response = await axios.get(
-        `https://pokeapi.co/api/v2/pokemon/${selectedPokemon}`
-      );
-      setPokemonData(response.data);
-    } catch (error) {
-      console.error("Error fetching Pokémon data:", error);
-    }
-
-    // Clear the suggestions
-    setSuggestedPokemon([]);
-  };
-
   const handleFormSubmit = (e) => {
     e.preventDefault();
     handleSearch();
-    handleSelect();
 
     // Clear the suggestions
     setSuggestedPokemon([]);
@@ -101,8 +106,6 @@ function PokemonSearch() {
       ) {
         setSuggestedPokemon([]); // Close the dropdown
       }
-
-
     };
 
     window.addEventListener("click", handleClickOutside);
@@ -125,7 +128,7 @@ function PokemonSearch() {
             onBlur={handleBlur}
             list="pokemonSuggestions"
           />
-          <button type="submit">Search</button>
+          <button type="submit">Enter</button>
         </form>
       </PokeSearch>
 
@@ -144,11 +147,19 @@ function PokemonSearch() {
             <h2 onClick={() => navigate(`/pokemon/${pokemonData.name}`)}>
               {pokemonData.name}
             </h2>
+            {/* Apply the styled component directly to the img tag */}
+            <PokeDexImage src={pokemonSprite} alt={pokemonData.name} />{" "}
+            {/* Display the sprite image */}
             <p>
               Types:{" "}
               {pokemonData.types.map((type) => type.type.name).join(", ")}
             </p>
-            {/* Display other Pokémon data as needed */}
+            <h3>Move Set</h3>
+            <ul>
+              {pokemonData.moves.slice(0, 5).map((moveData) => (
+                <li key={moveData.move.name}>{moveData.move.name}</li>
+              ))}
+            </ul>
           </div>
         </PokeDisplay>
       )}

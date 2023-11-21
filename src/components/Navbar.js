@@ -11,8 +11,8 @@ const Nav = styled.div`
 `;
 
 const CustomButton = styled.button`
-  background-color: #3498db;
-  color: white;
+  background-color: #dbdb34;
+  color: #090000;
   padding: 8px 16px;
   border: none;
   border-radius: 4px;
